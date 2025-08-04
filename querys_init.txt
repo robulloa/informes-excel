@@ -1,3 +1,14 @@
+-- register - server hostname 
+General->Name excel-db
+Connection->excel-db
+port 5432
+Maintenance postgres
+Username admin
+Password admin
+Save password yes
+
+Luego en Databases->excel_db ejecutar querys
+---
 CREATE TABLE IF NOT EXISTS registros (
                 id SERIAL PRIMARY KEY,
                 nombre VARCHAR(100),

@@ -1,0 +1,36 @@
+CREATE TABLE IF NOT EXISTS registros (
+                id SERIAL PRIMARY KEY,
+                nombre VARCHAR(100),
+                email VARCHAR(100),
+                puntaje INT
+            );
+
+CREATE TABLE IF NOT EXISTS usuarios (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(50) UNIQUE,
+                password VARCHAR(200),
+                role VARCHAR(20)
+            );
+-----
+
+-- Insertar usuario admin
+INSERT INTO usuarios (username, password, role)
+VALUES ('admin', 'pbkdf2:sha256:260000$uZLhXmWMQxfY1kDa$9956abf4d2e82725b1630d558aeec2ed4a63fd8fb695f4b054779b192956d8de', 'uploader');
+
+-- Insertar usuario viewer solo si no existe
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM usuarios WHERE username = 'viewer') THEN
+        INSERT INTO usuarios (username, password, role)
+        VALUES ('viewer', 'pbkdf2:sha256:260000$dPg3acpkalVeWvRe$7b07e422d103236b6aaa269c921c6985b201b3c163fe8191a766dca278788f2c', 'viewer');
+    END IF;
+END $$;
+
+-----
+SELECT id, username, password, role
+	FROM public.usuarios;
+-----
+SELECT id, nombre, email, puntaje
+	FROM public.registros;
+-----
+

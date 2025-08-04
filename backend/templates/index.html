@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carga de Excel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between">
+            <h1 class="mb-4">Cargar Excel y Ver Datos</h1>
+            <a href="/logout" class="btn btn-danger">Cerrar sesión</a>
+        </div>
+
+        {% if role == "uploader" %}
+        <form id="uploadForm" class="mb-4">
+            <div class="mb-3">
+                <input type="file" name="file" id="file" class="form-control" accept=".xlsx" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Subir</button>
+        </form>
+        {% else %}
+        <div class="alert alert-info">Solo tienes permisos de lectura.</div>
+        {% endif %}
+
+        <h3>Datos acumulados</h3>
+        <div class="mb-3">
+          <a href="/download" class="btn btn-success">Descargar Excel</a>
+        </div>
+        <table class="table table-bordered table-striped" id="dataTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Puntaje</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const role = "{{ role }}";
+    </script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

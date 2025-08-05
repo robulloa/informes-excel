@@ -59,6 +59,15 @@ def init_db():
                 role VARCHAR(20)
             );
         """))
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS eventos (
+                id SERIAL PRIMARY KEY,
+                usuario VARCHAR(50),
+                accion VARCHAR(50),
+                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """))
+
         # Insertar usuarios por defecto
         admin_exists = conn.execute(text("SELECT 1 FROM usuarios WHERE username='admin'")).fetchone()
         if not admin_exists:
@@ -75,6 +84,13 @@ def init_db():
 
 # Inicializar BD al arranque
 init_db()
+# Registrar evento
+def registrar_evento(usuario, accion):
+    with engine.begin() as conn:
+        conn.execute(
+            text("INSERT INTO eventos (usuario, accion) VALUES (:usuario, :accion)"),
+            {"usuario": usuario, "accion": accion}
+        )
 
 # =========================
 # CLASE USER PARA FLASK-LOGIN
@@ -113,6 +129,7 @@ def login():
 
         if user and check_password_hash(user.password, password):
             login_user(User(*user))
+            registrar_evento(username, "login")
             return redirect(url_for("index"))
         return render_template("login.html", error="Usuario o contraseña incorrectos")
     return render_template("login.html")
@@ -120,13 +137,14 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
+    registrar_evento(current_user.username, "logout")
     logout_user()
     return redirect(url_for("login"))
 
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html", role=current_user.role)
+    return render_template("index.html", role=current_user.role, username=current_user.username)
 
 @app.route("/upload", methods=["POST"])
 @login_required
@@ -140,6 +158,7 @@ def upload_excel():
 
     df = pd.read_excel(file)
     df.to_sql("registros", engine, if_exists="append", index=False)
+    registrar_evento(current_user.username, "subir_archivo")
     return jsonify({"message": "Datos insertados correctamente"})
 
 @app.route("/data", methods=["GET"])
@@ -167,6 +186,7 @@ def download_excel():
 
         output.seek(0)
 
+        registrar_evento(current_user.username, "descargar_archivo")
         return send_file(
             output,
             download_name="registros.xlsx",
@@ -176,6 +196,17 @@ def download_excel():
 
     except Exception as e:
         return f"Error generando Excel: {str(e)}", 500
+
+@app.route("/eventos", methods=["GET"])
+@login_required
+def ver_eventos():
+    if current_user.role != "uploader":
+        return jsonify({"error": "No tienes permisos"}), 403
+
+    query = "SELECT * FROM eventos ORDER BY fecha DESC"
+    df = pd.read_sql(query, engine)
+    registrar_evento(current_user.username, "ver_eventos")
+    return render_template("eventos.html", eventos=df.to_dict(orient="records"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

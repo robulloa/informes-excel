@@ -6,12 +6,24 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between">
-            <h1 class="mb-4">Cargar Excel y Ver Datos</h1>
-            <a href="/logout" class="btn btn-danger">Cerrar sesión</a>
-        </div>
 
+    <!-- Barra de navegación sticky -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+        <div class="container-fluid">
+            <span class="navbar-brand fs-3 fw-bold">📊 Carga de Excel</span>
+            <div class="d-flex align-items-center ms-auto">
+                <span class="badge bg-light text-dark me-3 p-3 fs-5">
+                    👤 {{ username }} — <strong>{{ role }}</strong>
+                </span>
+                {% if role == "uploader" %}
+                <a href="/eventos" class="btn btn-warning btn-lg me-3">Ver Eventos</a>
+                {% endif %}
+                <a href="/logout" class="btn btn-danger btn-lg">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
         {% if role == "uploader" %}
         <form id="uploadForm" class="mb-4">
             <div class="mb-3">
@@ -25,7 +37,7 @@
 
         <h3>Datos acumulados</h3>
         <div class="mb-3">
-          <a href="/download" class="btn btn-success">Descargar Excel</a>
+            <a href="/download" class="btn btn-success">Descargar Excel</a>
         </div>
         <table class="table table-bordered table-striped" id="dataTable">
             <thead>

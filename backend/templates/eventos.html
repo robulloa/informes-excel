@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Eventos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+        <div class="container-fluid">
+            <span class="navbar-brand fs-3 fw-bold">📊 Carga de Excel</span>
+            <div class="d-flex align-items-center ms-auto">
+                <span class="badge bg-light text-dark me-3 p-3 fs-5">
+                    👤 {{ current_user.username }} — <strong>{{ current_user.role }}</strong>
+                </span>
+                <a href="/" class="btn btn-outline-light btn-lg me-2">Inicio</a>
+                <a href="/logout" class="btn btn-outline-light btn-lg">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h3>Registro de Eventos</h3>
+        <table class="table table-striped table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td>{{ evento.id }}</td>
+                    <td>{{ evento.usuario }}</td>
+                    <td>{{ evento.accion }}</td>
+                    <td>{{ evento.fecha }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+

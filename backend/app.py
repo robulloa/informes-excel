@@ -64,7 +64,7 @@ def init_db():
                 id SERIAL PRIMARY KEY,
                 usuario VARCHAR(50),
                 accion VARCHAR(50),
-                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                fecha TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago')
             );
         """))
 
@@ -203,9 +203,14 @@ def ver_eventos():
     if current_user.role != "uploader":
         return jsonify({"error": "No tienes permisos"}), 403
 
-    query = "SELECT * FROM eventos ORDER BY fecha DESC"
-    df = pd.read_sql(query, engine)
     registrar_evento(current_user.username, "ver_eventos")
+    query = """
+        SELECT id, usuario, accion,
+               to_char(fecha, 'YYYY-MM-DD HH24:MI:SS') as fecha
+        FROM eventos
+        ORDER BY id DESC
+    """
+    df = pd.read_sql(query, engine)
     return render_template("eventos.html", eventos=df.to_dict(orient="records"))
 
 if __name__ == "__main__":

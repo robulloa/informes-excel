@@ -6,17 +6,24 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"  # Cambiar en producción
 
-# Configuración BD
-DB_USER = "admin"
-DB_PASSWORD = "admin"
-DB_HOST = "db"
-DB_NAME = "excel_db"
 
-engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}")
+# Configuración BD desde variables de entorno
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("POSTGRES_HOST")
+DB_PORT = os.getenv("POSTGRES_PORT")
+DB_NAME = os.getenv("POSTGRES_DB")
+
+engine = create_engine(
+    f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+)
+
+##engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}")
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
